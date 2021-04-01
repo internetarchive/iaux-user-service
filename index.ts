@@ -1,1 +1,2 @@
-export { YourWebComponent } from './src/your-webcomponent';
+export { UserService } from './src/user-service';
+export type { User } from './src/models';
