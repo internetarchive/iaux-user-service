@@ -17,17 +17,22 @@ export class UserService implements UserServiceInterface {
 
   private localCache?: LocalCacheInterface;
 
-  private readonly USER_INFO_KEY = 'loggedInUserInfo';
+  private userCacheKey;
+
+  private cacheTTL?: number;
 
   constructor(options?: {
     userServiceEndpoint?: string;
     localCache?: LocalCacheInterface;
     cacheTTL?: number;
+    userCacheKey?: string;
   }) {
     this.userServiceEndpoint =
       options?.userServiceEndpoint ??
       'https://archive.org/services/user.php?op=whoami';
     this.localCache = options?.localCache;
+    this.cacheTTL = options?.cacheTTL;
+    this.userCacheKey = options?.userCacheKey ?? 'loggedInUserInfo';
   }
 
   /** @inheritdoc */
@@ -48,14 +53,14 @@ export class UserService implements UserServiceInterface {
   }
 
   private async getPersistedUser(): Promise<User | null> {
-    return this.localCache?.get(this.USER_INFO_KEY);
+    return this.localCache?.get(this.userCacheKey);
   }
 
   private async persistUser(user: User): Promise<void> {
     await this.localCache?.set({
-      key: this.USER_INFO_KEY,
+      key: this.userCacheKey,
       value: user,
-      ttl: 60 * 1000,
+      ttl: this.cacheTTL, // if set, otherwise will default to the localCache default
     });
   }
 
