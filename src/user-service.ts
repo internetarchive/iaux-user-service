@@ -80,7 +80,7 @@ export class UserService implements UserServiceInterface {
     const sigCookiePromise = window.cookieStore.get('logged-in-sig');
     const userCookiePromise = window.cookieStore.get('logged-in-user');
     const results = await Promise.all([sigCookiePromise, userCookiePromise]);
-    const hasBothCookies = results[0] !== undefined && results[1] !== undefined;
+    const hasBothCookies = !!results[0] && !!results[1];
     return hasBothCookies;
   }
 }
