@@ -1,5 +1,4 @@
 import 'cookie-store';
-import { LocalCacheInterface } from '@internetarchive/local-cache';
 import { User, UserServiceResponse } from './models';
 
 export interface UserServiceInterface {
@@ -12,10 +11,22 @@ export interface UserServiceInterface {
   getLoggedInUser(): Promise<User | null>;
 }
 
+/**
+ * An interface for a cache to conform to for caching User info
+ *
+ * @export
+ * @interface UserServiceCacheInterface
+ */
+export interface UserServiceCacheInterface {
+  set(options: { key: string; value: any; ttl?: number }): Promise<void>;
+
+  get(key: string): Promise<any>;
+}
+
 export class UserService implements UserServiceInterface {
   private userServiceEndpoint: string;
 
-  private localCache?: LocalCacheInterface;
+  private cache?: UserServiceCacheInterface;
 
   private userCacheKey;
 
@@ -23,14 +34,14 @@ export class UserService implements UserServiceInterface {
 
   constructor(options?: {
     userServiceEndpoint?: string;
-    localCache?: LocalCacheInterface;
+    cache?: UserServiceCacheInterface;
     cacheTTL?: number;
     userCacheKey?: string;
   }) {
     this.userServiceEndpoint =
       options?.userServiceEndpoint ??
       'https://archive.org/services/user.php?op=whoami';
-    this.localCache = options?.localCache;
+    this.cache = options?.cache;
     this.cacheTTL = options?.cacheTTL;
     this.userCacheKey = options?.userCacheKey ?? 'loggedInUserInfo';
   }
@@ -53,11 +64,11 @@ export class UserService implements UserServiceInterface {
   }
 
   private async getPersistedUser(): Promise<User | null> {
-    return this.localCache?.get(this.userCacheKey);
+    return this.cache?.get(this.userCacheKey);
   }
 
   private async persistUser(user: User): Promise<void> {
-    await this.localCache?.set({
+    await this.cache?.set({
       key: this.userCacheKey,
       value: user,
       ttl: this.cacheTTL, // if set, otherwise will default to the localCache default

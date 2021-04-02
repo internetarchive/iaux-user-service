@@ -65,7 +65,7 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@internetarchive/local-cache@0.0.1-alpha.4":
+"@internetarchive/local-cache@^0.0.1-alpha.4":
   version "0.0.1-alpha.4"
   resolved "https://registry.yarnpkg.com/@internetarchive/local-cache/-/local-cache-0.0.1-alpha.4.tgz#bffc5e049299e1e7fb670f6e55783bb31383fe59"
   integrity sha512-TzdE9yvj6umekvpP3nARMIbafHNYUJ2AmT5iZyZkBZm8wXaGSPN0v4YfFXlUe0nLyJn7WYet6E7tlaAupDeliw==

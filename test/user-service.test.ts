@@ -96,7 +96,7 @@ describe('UserService', () => {
 
       const cache = new LocalCache({ namespace: 'boop' });
       const userService = new UserService({
-        localCache: cache,
+        cache,
         userCacheKey: 'foo-cache',
       });
       await userService.getLoggedInUser();
@@ -111,7 +111,7 @@ describe('UserService', () => {
 
       const cache = new LocalCache({ namespace: 'boop' });
       const userService = new UserService({
-        localCache: cache,
+        cache,
         userCacheKey: 'foo-cache',
       });
       await userService.getLoggedInUser();

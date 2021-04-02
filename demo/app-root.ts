@@ -14,7 +14,7 @@ import { UserService } from '../src/user-service';
 export class AppRoot extends LitElement {
   localCache = new LocalCache();
 
-  userService = new UserService({ localCache: this.localCache });
+  userService = new UserService({ cache: this.localCache });
 
   @internalProperty()
   private user?: User | null;
