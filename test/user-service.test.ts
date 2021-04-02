@@ -2,7 +2,11 @@ import { LocalCache } from '@internetarchive/local-cache';
 import { expect } from '@open-wc/testing';
 import Sinon, { SinonStub } from 'sinon';
 import { UserService } from '../src/user-service';
-import { getFailureResponse, getSuccessResponse } from './mock-responses';
+import {
+  getFailureResponse,
+  getSuccessResponse,
+  mockUser,
+} from './mock-responses';
 
 const sandbox = Sinon.createSandbox();
 let fetchStub: SinonStub | undefined;
@@ -16,6 +20,30 @@ describe('UserService', () => {
 
   afterEach(() => {
     sandbox.restore();
+  });
+
+  describe('configuratioono', () => {
+    it('uses the default endpoint', async () => {
+      cookieStoreStub?.returns('cookie-exists-foo'); // return anything to simulate cookies
+      fetchStub?.returns(getSuccessResponse());
+
+      const userService = new UserService();
+      await userService.getLoggedInUser();
+      expect(
+        fetchStub?.calledWith('https://archive.org/services/user.php?op=whoami')
+      ).to.be.true;
+    });
+
+    it('can customize the endpoint', async () => {
+      cookieStoreStub?.returns('cookie-exists-foo');
+      fetchStub?.returns(getSuccessResponse());
+
+      const userService = new UserService({
+        userServiceEndpoint: 'https://foo.org/user',
+      });
+      await userService.getLoggedInUser();
+      expect(fetchStub?.calledWith('https://foo.org/user')).to.be.true;
+    });
   });
 
   describe('getCurrentUserInfo', () => {
@@ -46,10 +74,24 @@ describe('UserService', () => {
       const user = await userService.getLoggedInUser();
       expect(user).to.equal(null);
     });
+  });
+
+  describe('caching', () => {
+    it('does not use cache if one not passed in', async () => {
+      cookieStoreStub?.returns('fake-ia-cookie');
+      fetchStub?.returns(getSuccessResponse());
+      const userService = new UserService({
+        userCacheKey: 'foo-cache',
+      });
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(1);
+      fetchStub?.returns(getSuccessResponse());
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(2);
+    });
 
     it('can cache the user object in localCache', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie'); // return fake ia cookie
-      // cookie may have expired
+      cookieStoreStub?.returns('fake-ia-cookie');
       fetchStub?.returns(getSuccessResponse());
 
       const cache = new LocalCache({ namespace: 'boop' });
@@ -57,16 +99,14 @@ describe('UserService', () => {
         localCache: cache,
         userCacheKey: 'foo-cache',
       });
-      const user = await userService.getLoggedInUser();
-      expect(user?.username).to.equal('foo@bar.com');
+      await userService.getLoggedInUser();
       const cachedResult = await cache.get('foo-cache');
-      expect(cachedResult).to.not.equal(undefined);
+      expect(cachedResult).to.deep.equal(mockUser);
       cache.delete('foo-cache');
     });
 
     it('returns a cached user', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie'); // return fake ia cookie
-      // cookie may have expired
+      cookieStoreStub?.returns('fake-ia-cookie');
       fetchStub?.returns(getSuccessResponse());
 
       const cache = new LocalCache({ namespace: 'boop' });

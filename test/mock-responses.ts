@@ -1,3 +1,5 @@
+import type { User } from '../src/models';
+
 function mockApiResponse(body = {}, status = 200) {
   return new window.Response(JSON.stringify(body), {
     status,
@@ -5,15 +7,17 @@ function mockApiResponse(body = {}, status = 200) {
   });
 }
 
+export const mockUser: User = {
+  username: 'foo@bar.com',
+  itemname: '@fooey-mcbarrison',
+  screenname: 'Foo-Bar',
+  privs: ['/'],
+};
+
 export function getSuccessResponse() {
   return mockApiResponse({
     success: true,
-    value: {
-      username: 'foo@bar.com',
-      itemname: '@fooey-mcbarrison',
-      screenname: 'Foo-Bar',
-      privs: ['/'],
-    },
+    value: mockUser,
   });
 }
 
