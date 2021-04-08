@@ -12,7 +12,7 @@ import { UserService } from '../src/user-service';
 
 @customElement('app-root')
 export class AppRoot extends LitElement {
-  localCache = new LocalCache();
+  localCache = new LocalCache({ defaultTTL: 60 * 1000 });
 
   userService = new UserService({ cache: this.localCache });
 
@@ -36,11 +36,10 @@ export class AppRoot extends LitElement {
       <pre>127.0.0.1 local.archive.org</pre>
       <p>
         Then access
-        <a href="https://local.archive.org:8000"
-          >https://local.archive.org:8000</a
+        <a href="https://local.archive.org:8000/demo"
+          >https://local.archive.org:8000/demo</a
         >
       </p>
-      <p>I</p>
       <hr />
       <h2>Status</h2>
       ${this.loading ? html`Loading...` : this.userInfoTemplate}
