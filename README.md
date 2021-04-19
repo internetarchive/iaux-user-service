@@ -1,21 +1,45 @@
-[![Build Status](https://travis-ci.com/internetarchive/iaux-your-webcomponent.svg?branch=master)](https://travis-ci.com/internetarchive/iaux-your-webcomponent) [![codecov](https://codecov.io/gh/internetarchive/iaux-your-webcomponent/branch/master/graph/badge.svg)](https://codecov.io/gh/internetarchive/iaux-your-webcomponent)
+[![Build Status](https://github.com/internetarchive/iaux-user-service/actions/workflows/ci.yml/badge.svg?branch=main)) [![codecov](https://codecov.io/gh/internetarchive/iaux-user-service/branch/master/graph/badge.svg)](https://codecov.io/gh/internetarchive/iaux-user-service)
 
-# Internet Archive Typescript WebComponent Template
+# IAUX User Service
 
-This is a base template for creating Typescript WebComponents. It is based off of the [Open WebComponents generator](https://open-wc.org/docs/development/generator/) with some IA-specific customizations and some development niceities.
+This is a Typescript library to interact with the Internet Archive's User Service.
 
 ## Usage
 
-1. Click the "Use this Template" button in GitHub to create a new repository based on this one.
-2. Clone your new repo and update the things below:
+```js
+import { UserService } from '@internetarchive/user-service';
 
-### Things to update in your copy
-1. Remove this section
-2. Search for the strings `your-webcomponent` and `YourWebComponent` and those are most of the spots that need to be updated.
-3. `README.md` (this file). Update the readme in general, but also the badge URLs
-4. `package.json` Update the name and description
-5. Rename the `your-webcomponent.ts` and its associated `.test` file
-6. Update `.travis.yml` with the proper secure key. See the [Travis docs](https://blog.travis-ci.com/2014-03-13-slack-notifications/) for more information.
+// instantiate a UserService object
+const userService = new UserService();
+
+// get the result
+const result = await userService.getLoggedInUser();
+
+// if the user is logged in, the User object will be in `result.success`
+const user = result.success;
+if (user) {
+  console.debug(
+    'User:', user.username, user.itemname, user.screenanme, user.privs
+  )
+  return;
+}
+
+// if the user is not logged in or you an error occurred,
+// you'll get a `result.error` and can inspect `result.error.type`:
+switch (result.error?.type) {
+  case UserServiceErrorType.userNotLoggedIn:
+    console.info('User not logged in');
+    break;
+  case UserServiceErrorType.networkError:
+    console.error('There was a network error fetching the user');
+    break;
+  case UserServiceErrorType.decodingError:
+    console.error('There was an error decoding the user service response');
+    break;
+  default:
+    console.error('An unknown error occurred fetching the user');
+}
+```
 
 ## Local Demo with `web-dev-server`
 ```bash

@@ -98,7 +98,6 @@ export class AppRoot extends LitElement {
     :host {
       display: block;
       padding: 25px;
-      color: var(--your-webcomponent-text-color, #000);
     }
   `;
 }
