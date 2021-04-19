@@ -73,22 +73,21 @@ export class AppRoot extends LitElement {
     const result = await this.userService.getLoggedInUser();
     if (result.success) {
       this.user = result.success;
-    } else if (result.error) {
-      switch (result.error.type) {
-        case UserServiceErrorType.userNotLoggedIn:
-          console.info('User not logged in');
-          break;
-        case UserServiceErrorType.networkError:
-          console.error('There was a network error fetching the user');
-          break;
-        case UserServiceErrorType.decodingError:
-          console.error(
-            'There was an error decoding the user service response'
-          );
-          break;
-        default:
-          console.error('An unknown error occurred fetching the user');
-      }
+      return;
+    }
+
+    switch (result.error?.type) {
+      case UserServiceErrorType.userNotLoggedIn:
+        console.info('User not logged in');
+        break;
+      case UserServiceErrorType.networkError:
+        console.error('There was a network error fetching the user');
+        break;
+      case UserServiceErrorType.decodingError:
+        console.error('There was an error decoding the user service response');
+        break;
+      default:
+        console.error('An unknown error occurred fetching the user');
     }
   }
 
