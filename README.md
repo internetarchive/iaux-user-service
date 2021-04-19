@@ -41,6 +41,23 @@ switch (result.error?.type) {
 }
 ```
 
+## Advanced Usage
+
+### Caching
+You can pass in a cache handler that implements `UserServiceCacheInterface` and the results will be cached:
+
+```js
+import { LocalCache } from '@internetarchive/local-cache';
+
+const cache = new LocalCache();
+const service = new UserService({
+  cache,
+  cacheTTL: 15 * 60 // seconds, optional
+})
+const result = await service.getLoggedInUser();
+// subsequent calls will be cached
+```
+
 ## Local Demo with `web-dev-server`
 ```bash
 yarn start
