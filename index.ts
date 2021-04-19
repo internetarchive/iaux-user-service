@@ -4,3 +4,7 @@ export type {
   UserServiceInterface,
   UserServiceCacheInterface,
 } from './src/user-service';
+export {
+  UserServiceError,
+  UserServiceErrorType,
+} from './src/user-service-error';
