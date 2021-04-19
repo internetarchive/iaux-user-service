@@ -10,7 +10,7 @@ export interface UserServiceInterface {
    * @returns {Promise<User> | null}
    * @memberof UserServiceInterface
    */
-  getLoggedInUserResult(): Promise<Result<User, UserServiceError>>;
+  getLoggedInUser(): Promise<Result<User, UserServiceError>>;
 }
 
 /**
@@ -49,7 +49,7 @@ export class UserService implements UserServiceInterface {
   }
 
   /** @inheritdoc */
-  async getLoggedInUserResult(): Promise<Result<User, UserServiceError>> {
+  async getLoggedInUser(): Promise<Result<User, UserServiceError>> {
     const hasCookies = await this.hasArchiveOrgLoggedInCookies();
     if (!hasCookies)
       return {

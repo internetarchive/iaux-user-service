@@ -70,7 +70,7 @@ export class AppRoot extends LitElement {
 
   private async fetchUser() {
     this.error = undefined;
-    const result = await this.userService.getLoggedInUserResult();
+    const result = await this.userService.getLoggedInUser();
     if (result.success) {
       this.user = result.success;
     } else if (result.error) {

@@ -29,7 +29,7 @@ describe('UserService', () => {
       fetchStub?.returns(getSuccessResponse());
 
       const userService = new UserService();
-      await userService.getLoggedInUserResult();
+      await userService.getLoggedInUser();
       expect(
         fetchStub?.calledWith('https://archive.org/services/user.php?op=whoami')
       ).to.be.true;
@@ -42,7 +42,7 @@ describe('UserService', () => {
       const userService = new UserService({
         userServiceEndpoint: 'https://foo.org/user',
       });
-      await userService.getLoggedInUserResult();
+      await userService.getLoggedInUser();
       expect(fetchStub?.calledWith('https://foo.org/user')).to.be.true;
     });
   });
@@ -53,7 +53,7 @@ describe('UserService', () => {
       fetchStub?.returns(getSuccessResponse());
 
       const userService = new UserService();
-      const result = await userService.getLoggedInUserResult();
+      const result = await userService.getLoggedInUser();
       expect(result.success?.screenname).to.equal('Foo-Bar');
     });
 
@@ -62,7 +62,7 @@ describe('UserService', () => {
       fetchStub?.returns(getSuccessResponse());
 
       const userService = new UserService();
-      const result = await userService.getLoggedInUserResult();
+      const result = await userService.getLoggedInUser();
       expect(result.success).to.equal(undefined);
       expect(result.error?.type).to.equal(UserServiceErrorType.userNotLoggedIn);
     });
@@ -73,7 +73,7 @@ describe('UserService', () => {
       fetchStub?.returns(getFailureResponse());
 
       const userService = new UserService();
-      const result = await userService.getLoggedInUserResult();
+      const result = await userService.getLoggedInUser();
       expect(result.success).to.equal(undefined);
       expect(result.error?.type).to.equal(UserServiceErrorType.userNotLoggedIn);
     });
@@ -86,10 +86,10 @@ describe('UserService', () => {
       const userService = new UserService({
         userCacheKey: 'foo-cache',
       });
-      await userService.getLoggedInUserResult();
+      await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(1);
       fetchStub?.returns(getSuccessResponse());
-      await userService.getLoggedInUserResult();
+      await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(2);
     });
 
@@ -102,7 +102,7 @@ describe('UserService', () => {
         cache,
         userCacheKey: 'foo-cache',
       });
-      await userService.getLoggedInUserResult();
+      await userService.getLoggedInUser();
       const cachedResult = await cache.get('foo-cache');
       expect(cachedResult).to.deep.equal(mockUser);
       cache.delete('foo-cache');
@@ -117,9 +117,9 @@ describe('UserService', () => {
         cache,
         userCacheKey: 'foo-cache',
       });
-      await userService.getLoggedInUserResult();
+      await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(1);
-      await userService.getLoggedInUserResult();
+      await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(1);
       cache.delete('foo-cache');
     });
