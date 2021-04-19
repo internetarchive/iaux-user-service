@@ -6,9 +6,10 @@ import {
   customElement,
   internalProperty,
 } from 'lit-element';
-import { TemplateResult } from 'lit-html';
+import { nothing, TemplateResult } from 'lit-html';
 import { User } from '../src/models';
 import { UserService } from '../src/user-service';
+import { UserServiceErrorType } from '../src/user-service-error';
 
 @customElement('app-root')
 export class AppRoot extends LitElement {
@@ -21,6 +22,9 @@ export class AppRoot extends LitElement {
 
   @internalProperty()
   private loading = false;
+
+  @internalProperty()
+  private error?: string;
 
   firstUpdated(): void {
     this.fetchUser();
@@ -42,7 +46,8 @@ export class AppRoot extends LitElement {
       </p>
       <hr />
       <h2>Status</h2>
-      ${this.loading ? html`Loading...` : this.userInfoTemplate}
+      ${this.error ? html`<p>Error: ${this.error}</p>` : nothing}
+      ${this.loading ? html`<p>Loading...</p>` : this.userInfoTemplate}
     `;
   }
 
@@ -64,7 +69,27 @@ export class AppRoot extends LitElement {
   }
 
   private async fetchUser() {
-    this.user = await this.userService.getLoggedInUser();
+    this.error = undefined;
+    const result = await this.userService.getLoggedInUserResult();
+    if (result.success) {
+      this.user = result.success;
+    } else if (result.error) {
+      switch (result.error.type) {
+        case UserServiceErrorType.userNotLoggedIn:
+          console.info('User not logged in');
+          break;
+        case UserServiceErrorType.networkError:
+          console.error('There was a network error fetching the user');
+          break;
+        case UserServiceErrorType.decodingError:
+          console.error(
+            'There was an error decoding the user service response'
+          );
+          break;
+        default:
+          console.error('An unknown error occurred fetching the user');
+      }
+    }
   }
 
   static styles = css`

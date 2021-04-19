@@ -1,5 +1,7 @@
+import { Result } from '@internetarchive/core';
 import 'cookie-store';
 import { User, UserServiceResponse } from './models';
+import { UserServiceError, UserServiceErrorType } from './user-service-error';
 
 export interface UserServiceInterface {
   /**
@@ -8,7 +10,7 @@ export interface UserServiceInterface {
    * @returns {Promise<User> | null}
    * @memberof UserServiceInterface
    */
-  getLoggedInUser(): Promise<User | null>;
+  getLoggedInUserResult(): Promise<Result<User, UserServiceError>>;
 }
 
 /**
@@ -47,20 +49,53 @@ export class UserService implements UserServiceInterface {
   }
 
   /** @inheritdoc */
-  async getLoggedInUser(): Promise<User | null> {
+  async getLoggedInUserResult(): Promise<Result<User, UserServiceError>> {
     const hasCookies = await this.hasArchiveOrgLoggedInCookies();
-    if (!hasCookies) return null;
+    if (!hasCookies)
+      return {
+        error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
+      };
 
     const persistedUser = await this.getPersistedUser();
-    if (persistedUser) return persistedUser;
-    const response = await fetch(this.userServiceEndpoint, {
-      credentials: 'include',
-    });
-    const result = (await response.json()) as UserServiceResponse;
-    if (!result.success || !result.value) return null;
-    const user = result.value;
-    await this.persistUser(user);
-    return user;
+    if (persistedUser) return { success: persistedUser };
+    let response: Response;
+    try {
+      response = await fetch(this.userServiceEndpoint, {
+        credentials: 'include',
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : err;
+      return {
+        error: new UserServiceError(UserServiceErrorType.networkError, message),
+      };
+    }
+
+    try {
+      const result = (await response.json()) as UserServiceResponse;
+
+      if (!result.success || !result.value) {
+        return {
+          error: new UserServiceError(
+            UserServiceErrorType.userNotLoggedIn,
+            result.error
+          ),
+        };
+      }
+
+      const user = result.value;
+      await this.persistUser(user);
+
+      // success
+      return { success: user };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : err;
+      return {
+        error: new UserServiceError(
+          UserServiceErrorType.decodingError,
+          message
+        ),
+      };
+    }
   }
 
   private async getPersistedUser(): Promise<User | null> {

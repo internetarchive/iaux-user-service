@@ -2,6 +2,7 @@ import { LocalCache } from '@internetarchive/local-cache';
 import { expect } from '@open-wc/testing';
 import Sinon, { SinonStub } from 'sinon';
 import { UserService } from '../src/user-service';
+import { UserServiceErrorType } from '../src/user-service-error';
 import {
   getFailureResponse,
   getSuccessResponse,
@@ -28,7 +29,7 @@ describe('UserService', () => {
       fetchStub?.returns(getSuccessResponse());
 
       const userService = new UserService();
-      await userService.getLoggedInUser();
+      await userService.getLoggedInUserResult();
       expect(
         fetchStub?.calledWith('https://archive.org/services/user.php?op=whoami')
       ).to.be.true;
@@ -41,7 +42,7 @@ describe('UserService', () => {
       const userService = new UserService({
         userServiceEndpoint: 'https://foo.org/user',
       });
-      await userService.getLoggedInUser();
+      await userService.getLoggedInUserResult();
       expect(fetchStub?.calledWith('https://foo.org/user')).to.be.true;
     });
   });
@@ -52,8 +53,8 @@ describe('UserService', () => {
       fetchStub?.returns(getSuccessResponse());
 
       const userService = new UserService();
-      const user = await userService.getLoggedInUser();
-      expect(user?.screenname).to.equal('Foo-Bar');
+      const result = await userService.getLoggedInUserResult();
+      expect(result.success?.screenname).to.equal('Foo-Bar');
     });
 
     it('returns null if user does not have IA cookies', async () => {
@@ -61,8 +62,9 @@ describe('UserService', () => {
       fetchStub?.returns(getSuccessResponse());
 
       const userService = new UserService();
-      const user = await userService.getLoggedInUser();
-      expect(user).to.equal(null);
+      const result = await userService.getLoggedInUserResult();
+      expect(result.success).to.equal(undefined);
+      expect(result.error?.type).to.equal(UserServiceErrorType.userNotLoggedIn);
     });
 
     it('returns null if authentication error', async () => {
@@ -71,8 +73,9 @@ describe('UserService', () => {
       fetchStub?.returns(getFailureResponse());
 
       const userService = new UserService();
-      const user = await userService.getLoggedInUser();
-      expect(user).to.equal(null);
+      const result = await userService.getLoggedInUserResult();
+      expect(result.success).to.equal(undefined);
+      expect(result.error?.type).to.equal(UserServiceErrorType.userNotLoggedIn);
     });
   });
 
@@ -83,10 +86,10 @@ describe('UserService', () => {
       const userService = new UserService({
         userCacheKey: 'foo-cache',
       });
-      await userService.getLoggedInUser();
+      await userService.getLoggedInUserResult();
       expect(fetchStub?.callCount).to.equal(1);
       fetchStub?.returns(getSuccessResponse());
-      await userService.getLoggedInUser();
+      await userService.getLoggedInUserResult();
       expect(fetchStub?.callCount).to.equal(2);
     });
 
@@ -99,7 +102,7 @@ describe('UserService', () => {
         cache,
         userCacheKey: 'foo-cache',
       });
-      await userService.getLoggedInUser();
+      await userService.getLoggedInUserResult();
       const cachedResult = await cache.get('foo-cache');
       expect(cachedResult).to.deep.equal(mockUser);
       cache.delete('foo-cache');
@@ -114,9 +117,9 @@ describe('UserService', () => {
         cache,
         userCacheKey: 'foo-cache',
       });
-      await userService.getLoggedInUser();
+      await userService.getLoggedInUserResult();
       expect(fetchStub?.callCount).to.equal(1);
-      await userService.getLoggedInUser();
+      await userService.getLoggedInUserResult();
       expect(fetchStub?.callCount).to.equal(1);
       cache.delete('foo-cache');
     });

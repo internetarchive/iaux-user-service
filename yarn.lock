@@ -65,6 +65,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@internetarchive/core@0.0.1-alpha.1":
+  version "0.0.1-alpha.1"
+  resolved "https://registry.yarnpkg.com/@internetarchive/core/-/core-0.0.1-alpha.1.tgz#5bc2bea13973cc47b6077e7a6eb148f49606dff6"
+  integrity sha512-LWM+1gKO6p3wBxUWooeuGVS7yMZv87GwUVOJhLC1h4eRzv+KjPo5g/HNsw4Qj4QciObtBxXD1oF5dfRXecpnPw==
+
 "@internetarchive/local-cache@^0.0.1-alpha.4":
   version "0.0.1-alpha.4"
   resolved "https://registry.yarnpkg.com/@internetarchive/local-cache/-/local-cache-0.0.1-alpha.4.tgz#bffc5e049299e1e7fb670f6e55783bb31383fe59"
