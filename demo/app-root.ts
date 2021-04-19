@@ -81,12 +81,15 @@ export class AppRoot extends LitElement {
         console.info('User not logged in');
         break;
       case UserServiceErrorType.networkError:
+        this.error = 'There was a network error fetching the user';
         console.error('There was a network error fetching the user');
         break;
       case UserServiceErrorType.decodingError:
+        this.error = 'There was an error decoding the user service response';
         console.error('There was an error decoding the user service response');
         break;
       default:
+        this.error = 'An unknown error occurred fetching the user';
         console.error('An unknown error occurred fetching the user');
     }
   }
