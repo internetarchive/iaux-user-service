@@ -1,4 +1,4 @@
-import { Result } from '@internetarchive/core';
+import { Result } from '@internetarchive/result-type';
 import 'cookie-store';
 import { User, UserServiceResponse } from './models';
 import { UserServiceError, UserServiceErrorType } from './user-service-error';
