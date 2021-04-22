@@ -1,4 +1,4 @@
-import type { User } from '../src/models';
+import { User } from '../src/models/user';
 
 function mockApiResponse(body = {}, status = 200) {
   return new window.Response(JSON.stringify(body), {
@@ -7,12 +7,12 @@ function mockApiResponse(body = {}, status = 200) {
   });
 }
 
-export const mockUser: User = {
+export const mockUser = new User({
   username: 'foo@bar.com',
   itemname: '@fooey-mcbarrison',
   screenname: 'Foo-Bar',
   privs: ['/'],
-};
+});
 
 export function getSuccessResponse() {
   return mockApiResponse({

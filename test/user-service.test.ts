@@ -23,7 +23,7 @@ describe('UserService', () => {
     sandbox.restore();
   });
 
-  describe('configuratioono', () => {
+  describe('configuration', () => {
     it('uses the default endpoint', async () => {
       cookieStoreStub?.returns('cookie-exists-foo'); // return anything to simulate cookies
       fetchStub?.returns(getSuccessResponse());

@@ -7,7 +7,7 @@ import {
   internalProperty,
 } from 'lit-element';
 import { nothing, TemplateResult } from 'lit-html';
-import { User } from '../src/models';
+import { User } from '../src/models/user';
 import { UserService } from '../src/user-service';
 import { UserServiceErrorType } from '../src/user-service-error';
 

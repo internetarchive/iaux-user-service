@@ -1,5 +1,6 @@
 export { UserService } from './src/user-service';
-export type { User } from './src/models';
+export { User } from './src/models/user';
+export type { UserInterface } from './src/models/user';
 export type {
   UserServiceInterface,
   UserServiceCacheInterface,

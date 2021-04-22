@@ -1,16 +1,18 @@
 import { Result } from '@internetarchive/result-type';
 import 'cookie-store';
-import { User, UserServiceResponse } from './models';
+import { UserResponse, UserServiceResponse } from './models/response';
+import { User } from './models/user';
+import type { UserInterface } from './models/user';
 import { UserServiceError, UserServiceErrorType } from './user-service-error';
 
 export interface UserServiceInterface {
   /**
    * Return the current user info or null if no current user
    *
-   * @returns {Promise<User> | null}
+   * @returns {Promise<Result<UserInterface, UserServiceError>>}
    * @memberof UserServiceInterface
    */
-  getLoggedInUser(): Promise<Result<User, UserServiceError>>;
+  getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>>;
 }
 
 /**
@@ -49,7 +51,7 @@ export class UserService implements UserServiceInterface {
   }
 
   /** @inheritdoc */
-  async getLoggedInUser(): Promise<Result<User, UserServiceError>> {
+  async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
     const hasCookies = await this.hasArchiveOrgLoggedInCookies();
     if (!hasCookies)
       return {
@@ -57,7 +59,11 @@ export class UserService implements UserServiceInterface {
       };
 
     const persistedUser = await this.getPersistedUser();
-    if (persistedUser) return { success: persistedUser };
+    if (persistedUser) {
+      const user = User.fromUserResponse(persistedUser);
+      return { success: user };
+    }
+
     let response: Response;
     try {
       response = await fetch(this.userServiceEndpoint, {
@@ -70,23 +76,9 @@ export class UserService implements UserServiceInterface {
       };
     }
 
+    let result: UserServiceResponse;
     try {
-      const result = (await response.json()) as UserServiceResponse;
-
-      if (!result.success || !result.value) {
-        return {
-          error: new UserServiceError(
-            UserServiceErrorType.userNotLoggedIn,
-            result.error
-          ),
-        };
-      }
-
-      const user = result.value;
-      await this.persistUser(user);
-
-      // success
-      return { success: user };
+      result = (await response.json()) as UserServiceResponse;
     } catch (err) {
       const message = err instanceof Error ? err.message : err;
       return {
@@ -96,13 +88,27 @@ export class UserService implements UserServiceInterface {
         ),
       };
     }
+
+    if (!result.success || !result.value) {
+      return {
+        error: new UserServiceError(
+          UserServiceErrorType.userNotLoggedIn,
+          result.error
+        ),
+      };
+    }
+
+    const userResponse = result.value;
+    const user = User.fromUserResponse(userResponse);
+    await this.persistUser(userResponse);
+    return { success: user };
   }
 
-  private async getPersistedUser(): Promise<User | null> {
+  private async getPersistedUser(): Promise<UserResponse | null> {
     return this.cache?.get(this.userCacheKey);
   }
 
-  private async persistUser(user: User): Promise<void> {
+  private async persistUser(user: UserResponse): Promise<void> {
     await this.cache?.set({
       key: this.userCacheKey,
       value: user,
