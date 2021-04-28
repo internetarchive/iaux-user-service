@@ -17,8 +17,6 @@ export interface UserInterface {
    * A common use of the itemname is to remove the leading `@`,
    * which is referred to as the userid.
    *
-   * This field is auto-generated when instantiating a User object.
-   *
    * eg. `foo-user`
    */
   userid: string;

@@ -8,12 +8,9 @@ export enum UserServiceErrorType {
 export class UserServiceError extends Error {
   type: UserServiceErrorType;
 
-  details?: any;
-
-  constructor(type: UserServiceErrorType, message?: string, details?: any) {
+  constructor(type: UserServiceErrorType, message?: string) {
     super(message);
     this.name = type;
     this.type = type;
-    this.details = details;
   }
 }

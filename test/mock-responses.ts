@@ -1,10 +1,14 @@
 import { User } from '../src/models/user';
 
-function mockApiResponse(body = {}, status = 200) {
-  return new window.Response(JSON.stringify(body), {
+export function getMockApiResponseFromString(body = '', status = 200) {
+  return new window.Response(body, {
     status,
     headers: { 'Content-type': 'application/json' },
   });
+}
+
+export function getMockApiResponseFromObject(body = {}, status = 200) {
+  return getMockApiResponseFromString(JSON.stringify(body), status);
 }
 
 export const mockUser = new User({
@@ -15,14 +19,14 @@ export const mockUser = new User({
 });
 
 export function getSuccessResponse() {
-  return mockApiResponse({
+  return getMockApiResponseFromObject({
     success: true,
     value: mockUser,
   });
 }
 
 export function getFailureResponse() {
-  return mockApiResponse(
+  return getMockApiResponseFromObject(
     {
       success: false,
       error: 'Authentication failed',

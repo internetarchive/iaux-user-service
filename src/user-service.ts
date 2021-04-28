@@ -70,9 +70,11 @@ export class UserService implements UserServiceInterface {
         credentials: 'include',
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : err;
       return {
-        error: new UserServiceError(UserServiceErrorType.networkError, message),
+        error: new UserServiceError(
+          UserServiceErrorType.networkError,
+          err.message
+        ),
       };
     }
 
@@ -80,11 +82,10 @@ export class UserService implements UserServiceInterface {
     try {
       result = (await response.json()) as UserServiceResponse;
     } catch (err) {
-      const message = err instanceof Error ? err.message : err;
       return {
         error: new UserServiceError(
           UserServiceErrorType.decodingError,
-          message
+          err.message
         ),
       };
     }

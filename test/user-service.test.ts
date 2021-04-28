@@ -7,6 +7,7 @@ import {
   getFailureResponse,
   getSuccessResponse,
   mockUser,
+  getMockApiResponseFromString,
 } from './mock-responses';
 
 const sandbox = Sinon.createSandbox();
@@ -57,7 +58,7 @@ describe('UserService', () => {
       expect(result.success?.screenname).to.equal('Foo-Bar');
     });
 
-    it('returns null if user does not have IA cookies', async () => {
+    it('returns UserServiceErrorType.userNotLoggedIn if user does not have IA cookies', async () => {
       cookieStoreStub?.returns(undefined); // return no cookie
       fetchStub?.returns(getSuccessResponse());
 
@@ -67,7 +68,7 @@ describe('UserService', () => {
       expect(result.error?.type).to.equal(UserServiceErrorType.userNotLoggedIn);
     });
 
-    it('returns null if authentication error', async () => {
+    it('returns UserServiceErrorType.userNotLoggedIn if authentication error', async () => {
       cookieStoreStub?.returns('fake-ia-cookie'); // return fake ia cookie
       // cookie may have expired
       fetchStub?.returns(getFailureResponse());
@@ -76,6 +77,38 @@ describe('UserService', () => {
       const result = await userService.getLoggedInUser();
       expect(result.success).to.equal(undefined);
       expect(result.error?.type).to.equal(UserServiceErrorType.userNotLoggedIn);
+    });
+
+    it('returns UserServiceErrorType.networkError if there is a network failure', async () => {
+      cookieStoreStub?.returns('fake-ia-cookie');
+      fetchStub?.rejects();
+
+      const userService = new UserService();
+      const result = await userService.getLoggedInUser();
+      expect(result.success).to.equal(undefined);
+      expect(result.error?.type).to.equal(UserServiceErrorType.networkError);
+    });
+
+    it('returns UserServiceErrorType.networkError with proper message', async () => {
+      cookieStoreStub?.returns('fake-ia-cookie');
+      fetchStub?.rejects(new Error('oh dear'));
+
+      const userService = new UserService();
+      const result = await userService.getLoggedInUser();
+      expect(result.success).to.equal(undefined);
+      expect(result.error?.type).to.equal(UserServiceErrorType.networkError);
+      expect(result.error?.message).to.equal('oh dear');
+    });
+
+    it('returns UserServiceErrorType.decodingError if the decoding fails', async () => {
+      cookieStoreStub?.returns('cookie-exists-foo');
+      const response = getMockApiResponseFromString('blah blah blah');
+      fetchStub?.returns(response);
+
+      const userService = new UserService();
+      const result = await userService.getLoggedInUser();
+      expect(result.success).to.equal(undefined);
+      expect(result.error?.type).to.equal(UserServiceErrorType.decodingError);
     });
   });
 
