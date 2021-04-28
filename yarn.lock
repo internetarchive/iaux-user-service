@@ -72,10 +72,10 @@
   dependencies:
     idb-keyval "^5.0.4"
 
-"@internetarchive/result-type@0.0.1-alpha.1":
-  version "0.0.1-alpha.1"
-  resolved "https://registry.yarnpkg.com/@internetarchive/result-type/-/result-type-0.0.1-alpha.1.tgz#3dbd3f5336bd5cd1d892840b43ec32fa84f2c8c0"
-  integrity sha512-r78+DU6gcI8YU5iC3AoRH1O3MuQOHwREuk3b2Iiln+cc5UD1O/0Mx8RINFqyqD7PG0xeQDIGTorjjNndaNppxg==
+"@internetarchive/result-type@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@internetarchive/result-type/-/result-type-0.0.1.tgz#a1bda4428dc557cc644a67783f1b8d5944ae4d54"
+  integrity sha512-sWahff5oP1xAK1CwAu1/5GTG2RXsdx/sQKn4SSOWH0r0vU2QoX9kAom/jSXeBsmgK0IjTc+9Ty9407SMORi+nQ==
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
