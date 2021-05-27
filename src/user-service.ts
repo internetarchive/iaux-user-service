@@ -52,18 +52,40 @@ export class UserService implements UserServiceInterface {
 
   /** @inheritdoc */
   async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
+    // if the user doesn't have IA cookies, just return a `userNotLoggedIn` error
     const hasCookies = await this.hasArchiveOrgLoggedInCookies();
     if (!hasCookies)
       return {
         error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
       };
 
+    // check for cached user
     const persistedUser = await this.getPersistedUser();
     if (persistedUser) {
       const user = User.fromUserResponse(persistedUser);
       return { success: user };
     }
 
+    // if another fetch is in progress, chain this request to it
+    if (this.fetchPromise) {
+      this.fetchPromise = this.fetchPromise.then(response => {
+        return response;
+      });
+      return this.fetchPromise;
+    }
+
+    // assign the fetch promise so chaining starts
+    this.fetchPromise = this.fetchUser();
+    // fetch the result
+    const result = await this.fetchPromise;
+    // reset it so subsequent requests go through normal flow
+    this.fetchPromise = undefined;
+    return result;
+  }
+
+  private fetchPromise?: Promise<Result<UserInterface, UserServiceError>>;
+
+  private async fetchUser(): Promise<Result<UserInterface, UserServiceError>> {
     let response: Response;
     try {
       response = await fetch(this.userServiceEndpoint, {

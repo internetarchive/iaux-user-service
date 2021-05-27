@@ -110,6 +110,56 @@ describe('UserService', () => {
       expect(result.success).to.equal(undefined);
       expect(result.error?.type).to.equal(UserServiceErrorType.decodingError);
     });
+
+    it('chains concurrent requests into a single fetch', async () => {
+      cookieStoreStub?.returns('fake-ia-cookie');
+      fetchStub?.returns(getSuccessResponse());
+
+      const cache = new LocalCache({ namespace: 'boop' });
+      const userService = new UserService({
+        cache,
+        userCacheKey: 'foo-cache',
+      });
+
+      const results = await Promise.all([
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+      ]);
+
+      // 4 concurrent requests will only make a single fetch
+      expect(fetchStub?.callCount).to.equal(1);
+
+      // validate all of the results got populated properly
+      expect(results[0].success?.screenname).to.equal('Foo-Bar');
+      expect(results[1].success?.screenname).to.equal('Foo-Bar');
+      expect(results[2].success?.screenname).to.equal('Foo-Bar');
+      expect(results[3].success?.screenname).to.equal('Foo-Bar');
+
+      cache.delete('foo-cache');
+    });
+
+    it('allows new requests after concurrent requests are completed', async () => {
+      cookieStoreStub?.returns('fake-ia-cookie');
+      fetchStub?.returns(getSuccessResponse());
+
+      // don't use the cache so we can verify fetch behavior
+      const userService = new UserService();
+
+      await Promise.all([
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+      ]);
+      expect(fetchStub?.callCount).to.equal(1);
+
+      // after the concurrent requests finish, since we don't have a cache,
+      // another fetch gets made
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(2);
+    });
   });
 
   describe('caching', () => {
