@@ -110,6 +110,51 @@ describe('UserService', () => {
       expect(result.success).to.equal(undefined);
       expect(result.error?.type).to.equal(UserServiceErrorType.decodingError);
     });
+
+    it('only allows a single request at a time', async () => {
+      cookieStoreStub?.returns('fake-ia-cookie');
+      fetchStub?.returns(getSuccessResponse());
+
+      const cache = new LocalCache({ namespace: 'boop' });
+      const userService = new UserService({
+        cache,
+        userCacheKey: 'foo-cache',
+      });
+
+      const results = await Promise.all([
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+      ]);
+
+      expect(fetchStub?.callCount).to.equal(1);
+
+      // validate all of the results got populated properly
+      expect(results[0].success?.screenname).to.equal('Foo-Bar');
+      expect(results[1].success?.screenname).to.equal('Foo-Bar');
+      expect(results[2].success?.screenname).to.equal('Foo-Bar');
+      expect(results[3].success?.screenname).to.equal('Foo-Bar');
+
+      cache.delete('foo-cache');
+    });
+
+    it('allows new requests after concurrent requests are completed', async () => {
+      cookieStoreStub?.returns('fake-ia-cookie');
+      fetchStub?.returns(getSuccessResponse());
+
+      const userService = new UserService();
+
+      await Promise.all([
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+        userService.getLoggedInUser(),
+      ]);
+      expect(fetchStub?.callCount).to.equal(1);
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(2);
+    });
   });
 
   describe('caching', () => {
