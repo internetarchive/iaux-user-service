@@ -111,7 +111,7 @@ describe('UserService', () => {
       expect(result.error?.type).to.equal(UserServiceErrorType.decodingError);
     });
 
-    it('only allows a single request at a time', async () => {
+    it('chains concurrent requests into a single fetch', async () => {
       cookieStoreStub?.returns('fake-ia-cookie');
       fetchStub?.returns(getSuccessResponse());
 
@@ -128,6 +128,7 @@ describe('UserService', () => {
         userService.getLoggedInUser(),
       ]);
 
+      // 4 concurrent requests will only make a single fetch
       expect(fetchStub?.callCount).to.equal(1);
 
       // validate all of the results got populated properly
@@ -143,6 +144,7 @@ describe('UserService', () => {
       cookieStoreStub?.returns('fake-ia-cookie');
       fetchStub?.returns(getSuccessResponse());
 
+      // don't use the cache so we can verify fetch behavior
       const userService = new UserService();
 
       await Promise.all([
@@ -152,6 +154,9 @@ describe('UserService', () => {
         userService.getLoggedInUser(),
       ]);
       expect(fetchStub?.callCount).to.equal(1);
+
+      // after the concurrent requests finish, since we don't have a cache,
+      // another fetch gets made
       await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(2);
     });
