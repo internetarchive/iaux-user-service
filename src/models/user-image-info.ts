@@ -78,22 +78,25 @@ export class UserImageInfo implements UserImageInfoInterface {
 
   static fromResponse(userResponse: UserImageInfoResponse): UserImageInfo {
     const numberParser = NumberParser.shared;
+    let mtime: number | undefined;
+    let size: number | undefined;
+    let rotation: number | undefined;
+
+    if (userResponse.mtime) mtime = numberParser.parseValue(userResponse.mtime);
+    if (userResponse.size) size = numberParser.parseValue(userResponse.size);
+    if (userResponse.rotation)
+      rotation = numberParser.parseValue(userResponse.rotation);
+
     return new UserImageInfo({
       name: userResponse.name,
       source: userResponse.source,
-      mtime: userResponse.mtime
-        ? numberParser.parseValue(userResponse.mtime)
-        : undefined,
-      size: userResponse.size
-        ? numberParser.parseValue(userResponse.size)
-        : undefined,
+      mtime,
+      size,
       md5: userResponse.md5,
       crc32: userResponse.crc32,
       sha1: userResponse.sha1,
       format: userResponse.format,
-      rotation: userResponse.rotation
-        ? numberParser.parseValue(userResponse.rotation)
-        : undefined,
+      rotation,
     });
   }
 
