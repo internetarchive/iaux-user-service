@@ -77,21 +77,22 @@ export class UserImageInfo implements UserImageInfoInterface {
   rotation?: number;
 
   static fromResponse(userResponse: UserImageInfoResponse): UserImageInfo {
+    const numberParser = NumberParser.shared;
     return new UserImageInfo({
       name: userResponse.name,
       source: userResponse.source,
       mtime: userResponse.mtime
-        ? NumberParser.shared.parseValue(userResponse.mtime)
+        ? numberParser.parseValue(userResponse.mtime)
         : undefined,
       size: userResponse.size
-        ? NumberParser.shared.parseValue(userResponse.size)
+        ? numberParser.parseValue(userResponse.size)
         : undefined,
       md5: userResponse.md5,
       crc32: userResponse.crc32,
       sha1: userResponse.sha1,
       format: userResponse.format,
       rotation: userResponse.rotation
-        ? NumberParser.shared.parseValue(userResponse.rotation)
+        ? numberParser.parseValue(userResponse.rotation)
         : undefined,
     });
   }
