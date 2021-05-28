@@ -65,10 +65,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@internetarchive/field-parsers@0.0.1-alpha.3":
-  version "0.0.1-alpha.3"
-  resolved "https://registry.yarnpkg.com/@internetarchive/field-parsers/-/field-parsers-0.0.1-alpha.3.tgz#a7f0a1bd65077895ad4ece59f33485b3816fb8d1"
-  integrity sha512-hpuOZev9+RycyzTG9UTf7Zxneyt+wKNKMb1MvXyb8aSdlUSYk3S1SPaHdmqaX7WLnVtWEbyLuJuIiX6rtZTyuA==
+"@internetarchive/field-parsers@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@internetarchive/field-parsers/-/field-parsers-0.1.0.tgz#de8b42bb5f7d9fc696086815585a3174dacf0b57"
+  integrity sha512-6ByLemKZvCMJrDglC1Om5bkTT7pB/5Lq0uKkGzb4sO88+lTDy6pqbGGw6VGEe6gAYgyDKiTlNUyUoTzF5brq3Q==
 
 "@internetarchive/local-cache@^0.0.1-alpha.4":
   version "0.0.1-alpha.4"
