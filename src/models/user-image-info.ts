@@ -1,4 +1,4 @@
-import { NumberParser } from '@internetarchive/field-parsers';
+import { Byte, ByteParser, NumberParser } from '@internetarchive/field-parsers';
 import { UserImageInfoResponse } from './response';
 
 export interface UserImageInfoInterface {
@@ -18,9 +18,9 @@ export interface UserImageInfoInterface {
   mtime?: number;
 
   /**
-   * The file size
+   * The file size in bytes
    */
-  size?: number;
+  size?: Byte;
 
   /**
    * The md5 hash
@@ -59,7 +59,7 @@ export class UserImageInfo implements UserImageInfoInterface {
   mtime?: number;
 
   /** @inheritdoc */
-  size?: number;
+  size?: Byte;
 
   /** @inheritdoc */
   md5?: string;
@@ -78,14 +78,22 @@ export class UserImageInfo implements UserImageInfoInterface {
 
   static fromResponse(userResponse: UserImageInfoResponse): UserImageInfo {
     const numberParser = NumberParser.shared;
+    const byteParser = ByteParser.shared;
     let mtime: number | undefined;
     let size: number | undefined;
     let rotation: number | undefined;
 
-    if (userResponse.mtime) mtime = numberParser.parseValue(userResponse.mtime);
-    if (userResponse.size) size = numberParser.parseValue(userResponse.size);
-    if (userResponse.rotation)
+    if (userResponse.mtime) {
+      mtime = numberParser.parseValue(userResponse.mtime);
+    }
+
+    if (userResponse.size) {
+      size = byteParser.parseValue(userResponse.size);
+    }
+
+    if (userResponse.rotation) {
       rotation = numberParser.parseValue(userResponse.rotation);
+    }
 
     return new UserImageInfo({
       name: userResponse.name,
