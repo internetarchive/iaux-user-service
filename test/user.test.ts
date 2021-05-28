@@ -8,6 +8,10 @@ describe('User', () => {
       itemname: '@foo-user',
       screenname: 'Foo-Bar',
       privs: ['/'],
+      image_info: {
+        name: 'foo.jpg',
+        mtime: 1234,
+      },
     });
 
     expect(user.username).to.equal('foo@bar.org');
@@ -15,6 +19,8 @@ describe('User', () => {
     expect(user.screenname).to.equal('Foo-Bar');
     expect(user.userid).to.equal('foo-user');
     expect(user.privs).to.deep.equal(['/']);
+    expect(user.image_info.name).to.equal('foo.jpg');
+    expect(user.image_info.mtime).to.equal(1234);
   });
 
   it('userid is the itemname if it has no at sign', async () => {
@@ -23,9 +29,15 @@ describe('User', () => {
       itemname: 'foo-user',
       screenname: 'Foo-Bar',
       privs: ['/'],
+      image_info: {
+        name: 'foo.jpg',
+        mtime: 4567,
+      },
     });
 
     expect(user.itemname).to.equal('foo-user');
     expect(user.userid).to.equal('foo-user');
+    expect(user.image_info.name).to.equal('foo.jpg');
+    expect(user.image_info.mtime).to.equal(4567);
   });
 });

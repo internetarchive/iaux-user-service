@@ -21,6 +21,7 @@
     "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\""
   },
   "dependencies": {
+    "@internetarchive/field-parsers": "^0.1.0",
     "@internetarchive/result-type": "^0.0.1",
     "cookie-store": "^3.0.0"
   },

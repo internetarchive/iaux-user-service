@@ -6,8 +6,8 @@ import { UserServiceErrorType } from '../src/user-service-error';
 import {
   getFailureResponse,
   getSuccessResponse,
-  mockUser,
   getMockApiResponseFromString,
+  mockUserResponse,
 } from './mock-responses';
 
 const sandbox = Sinon.createSandbox();
@@ -187,7 +187,7 @@ describe('UserService', () => {
       });
       await userService.getLoggedInUser();
       const cachedResult = await cache.get('foo-cache');
-      expect(cachedResult).to.deep.equal(mockUser);
+      expect(cachedResult).to.deep.equal(mockUserResponse);
       cache.delete('foo-cache');
     });
 
