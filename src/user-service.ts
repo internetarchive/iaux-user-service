@@ -1,5 +1,5 @@
+import cookie from 'cookiejs';
 import { Result } from '@internetarchive/result-type';
-import 'cookie-store';
 import { UserResponse, UserServiceResponse } from './models/response';
 import { User } from './models/user';
 import type { UserInterface } from './models/user';
@@ -53,7 +53,10 @@ export class UserService implements UserServiceInterface {
   /** @inheritdoc */
   async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
     // if the user doesn't have IA cookies, just return a `userNotLoggedIn` error
-    const hasCookies = await this.hasArchiveOrgLoggedInCookies();
+    const cookieUserInfo = await this.loggedInCookies();
+    const hasCookies =
+      cookieUserInfo.loggedInUsername !== false &&
+      cookieUserInfo.loggedInSignature !== false;
     if (!hasCookies)
       return {
         error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
@@ -63,7 +66,11 @@ export class UserService implements UserServiceInterface {
     const persistedUser = await this.getPersistedUser();
     if (persistedUser) {
       const user = User.fromUserResponse(persistedUser);
-      return { success: user };
+      const nameMatches = cookieUserInfo.loggedInUsername === user.username;
+      // verify that the cached used matches the user in the cookie
+      if (nameMatches) {
+        return { success: user };
+      }
     }
 
     // if another fetch is in progress, chain this request to it
@@ -128,7 +135,8 @@ export class UserService implements UserServiceInterface {
   }
 
   private async getPersistedUser(): Promise<UserResponse | null> {
-    return this.cache?.get(this.userCacheKey);
+    const persistedUser = await this.cache?.get(this.userCacheKey);
+    return persistedUser;
   }
 
   private async persistUser(user: UserResponse): Promise<void> {
@@ -140,11 +148,13 @@ export class UserService implements UserServiceInterface {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private async hasArchiveOrgLoggedInCookies(): Promise<boolean> {
-    const sigCookiePromise = window.cookieStore.get('logged-in-sig');
-    const userCookiePromise = window.cookieStore.get('logged-in-user');
-    const results = await Promise.all([sigCookiePromise, userCookiePromise]);
-    const hasBothCookies = !!results[0] && !!results[1];
-    return hasBothCookies;
+  private async loggedInCookies(): Promise<{
+    loggedInUsername: string | boolean;
+    loggedInSignature: string | boolean;
+  }> {
+    return {
+      loggedInUsername: cookie.get('logged-in-user'),
+      loggedInSignature: cookie.get('logged-in-sig'),
+    };
   }
 }

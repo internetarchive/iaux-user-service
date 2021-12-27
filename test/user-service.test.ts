@@ -1,3 +1,4 @@
+import cookie from 'cookiejs';
 import { LocalCache } from '@internetarchive/local-cache';
 import { expect } from '@open-wc/testing';
 import Sinon, { SinonStub } from 'sinon';
@@ -12,12 +13,14 @@ import {
 
 const sandbox = Sinon.createSandbox();
 let fetchStub: SinonStub | undefined;
-let cookieStoreStub: SinonStub | undefined;
 
 describe('UserService', () => {
   beforeEach(() => {
     fetchStub = sandbox.stub(window, 'fetch');
-    cookieStoreStub = sandbox.stub(window.cookieStore, 'get');
+    cookie.clear();
+    cookie.set('logged-in-user', 'foo@bar.com');
+    cookie.set('logged-in-sig', 'abc123');
+    fetchStub?.returns(getSuccessResponse());
   });
 
   afterEach(() => {
@@ -26,9 +29,6 @@ describe('UserService', () => {
 
   describe('configuration', () => {
     it('uses the default endpoint', async () => {
-      cookieStoreStub?.returns('cookie-exists-foo'); // return anything to simulate cookies
-      fetchStub?.returns(getSuccessResponse());
-
       const userService = new UserService();
       await userService.getLoggedInUser();
       expect(
@@ -37,9 +37,6 @@ describe('UserService', () => {
     });
 
     it('can customize the endpoint', async () => {
-      cookieStoreStub?.returns('cookie-exists-foo');
-      fetchStub?.returns(getSuccessResponse());
-
       const userService = new UserService({
         userServiceEndpoint: 'https://foo.org/user',
       });
@@ -50,17 +47,13 @@ describe('UserService', () => {
 
   describe('getCurrentUserInfo', () => {
     it('can fetch logged in user info', async () => {
-      cookieStoreStub?.returns('cookie-exists-foo'); // return anything to simulate cookies
-      fetchStub?.returns(getSuccessResponse());
-
       const userService = new UserService();
       const result = await userService.getLoggedInUser();
       expect(result.success?.screenname).to.equal('Foo-Bar');
     });
 
     it('returns UserServiceErrorType.userNotLoggedIn if user does not have IA cookies', async () => {
-      cookieStoreStub?.returns(undefined); // return no cookie
-      fetchStub?.returns(getSuccessResponse());
+      cookie.clear();
 
       const userService = new UserService();
       const result = await userService.getLoggedInUser();
@@ -69,7 +62,6 @@ describe('UserService', () => {
     });
 
     it('returns UserServiceErrorType.userNotLoggedIn if authentication error', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie'); // return fake ia cookie
       // cookie may have expired
       fetchStub?.returns(getFailureResponse());
 
@@ -80,7 +72,6 @@ describe('UserService', () => {
     });
 
     it('returns UserServiceErrorType.networkError if there is a network failure', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie');
       fetchStub?.rejects();
 
       const userService = new UserService();
@@ -90,7 +81,6 @@ describe('UserService', () => {
     });
 
     it('returns UserServiceErrorType.networkError with proper message', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie');
       fetchStub?.rejects(new Error('oh dear'));
 
       const userService = new UserService();
@@ -101,7 +91,6 @@ describe('UserService', () => {
     });
 
     it('returns UserServiceErrorType.decodingError if the decoding fails', async () => {
-      cookieStoreStub?.returns('cookie-exists-foo');
       const response = getMockApiResponseFromString('blah blah blah');
       fetchStub?.returns(response);
 
@@ -112,9 +101,6 @@ describe('UserService', () => {
     });
 
     it('chains concurrent requests into a single fetch', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie');
-      fetchStub?.returns(getSuccessResponse());
-
       const cache = new LocalCache({ namespace: 'boop' });
       const userService = new UserService({
         cache,
@@ -141,9 +127,6 @@ describe('UserService', () => {
     });
 
     it('allows new requests after concurrent requests are completed', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie');
-      fetchStub?.returns(getSuccessResponse());
-
       // don't use the cache so we can verify fetch behavior
       const userService = new UserService();
 
@@ -164,8 +147,6 @@ describe('UserService', () => {
 
   describe('caching', () => {
     it('does not use cache if one not passed in', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie');
-      fetchStub?.returns(getSuccessResponse());
       const userService = new UserService({
         userCacheKey: 'foo-cache',
       });
@@ -177,9 +158,6 @@ describe('UserService', () => {
     });
 
     it('can cache the user object in localCache', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie');
-      fetchStub?.returns(getSuccessResponse());
-
       const cache = new LocalCache({ namespace: 'boop' });
       const userService = new UserService({
         cache,
@@ -192,9 +170,6 @@ describe('UserService', () => {
     });
 
     it('returns a cached user', async () => {
-      cookieStoreStub?.returns('fake-ia-cookie');
-      fetchStub?.returns(getSuccessResponse());
-
       const cache = new LocalCache({ namespace: 'boop' });
       const userService = new UserService({
         cache,
@@ -204,6 +179,24 @@ describe('UserService', () => {
       expect(fetchStub?.callCount).to.equal(1);
       await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(1);
+      cache.delete('foo-cache');
+    });
+
+    it('refetches the user if the cached user does not match the cookie user', async () => {
+      const cache = new LocalCache({ namespace: 'boop' });
+      const userService = new UserService({
+        cache,
+        userCacheKey: 'foo-cache',
+      });
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(1);
+
+      // now return a different user from the cookie
+      cookie.set('logged-in-user', 'user@foo.com');
+      cookie.set('logged-in-sig', 'abc123');
+
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(2); //
       cache.delete('foo-cache');
     });
   });
