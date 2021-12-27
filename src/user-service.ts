@@ -52,11 +52,11 @@ export class UserService implements UserServiceInterface {
 
   /** @inheritdoc */
   async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
-    // if the user doesn't have IA cookies, just return a `userNotLoggedIn` error
-    const cookieUserInfo = await this.loggedInCookies();
+    const loggedInUsername = cookie.get('logged-in-user');
+    const loggedInSignature = cookie.get('logged-in-sig');
+
     const hasCookies =
-      cookieUserInfo.loggedInUsername !== false &&
-      cookieUserInfo.loggedInSignature !== false;
+      loggedInUsername !== false && loggedInSignature !== false;
     if (!hasCookies)
       return {
         error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
@@ -66,7 +66,7 @@ export class UserService implements UserServiceInterface {
     const persistedUser = await this.getPersistedUser();
     if (persistedUser) {
       const user = User.fromUserResponse(persistedUser);
-      const nameMatches = cookieUserInfo.loggedInUsername === user.username;
+      const nameMatches = loggedInUsername === user.username;
       // verify that the cached used matches the user in the cookie
       if (nameMatches) {
         return { success: user };
@@ -102,7 +102,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.networkError,
-          err.message
+          (err as Error).message
         ),
       };
     }
@@ -114,7 +114,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.decodingError,
-          err.message
+          (err as Error).message
         ),
       };
     }
@@ -145,16 +145,5 @@ export class UserService implements UserServiceInterface {
       value: user,
       ttl: this.cacheTTL, // if set, otherwise will default to the localCache default
     });
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  private async loggedInCookies(): Promise<{
-    loggedInUsername: string | boolean;
-    loggedInSignature: string | boolean;
-  }> {
-    return {
-      loggedInUsername: cookie.get('logged-in-user'),
-      loggedInSignature: cookie.get('logged-in-sig'),
-    };
   }
 }
