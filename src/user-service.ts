@@ -135,8 +135,7 @@ export class UserService implements UserServiceInterface {
   }
 
   private async getPersistedUser(): Promise<UserResponse | null> {
-    const persistedUser = await this.cache?.get(this.userCacheKey);
-    return persistedUser;
+    return this.cache?.get(this.userCacheKey);
   }
 
   private async persistUser(user: UserResponse): Promise<void> {
