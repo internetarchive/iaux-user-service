@@ -196,7 +196,8 @@ describe('UserService', () => {
       cookie.set('logged-in-sig', 'abc123');
 
       await userService.getLoggedInUser();
-      expect(fetchStub?.callCount).to.equal(2); //
+      // we should have fetched again
+      expect(fetchStub?.callCount).to.equal(2);
       cache.delete('foo-cache');
     });
   });

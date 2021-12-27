@@ -52,11 +52,10 @@ export class UserService implements UserServiceInterface {
 
   /** @inheritdoc */
   async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
-    const loggedInUsername = cookie.get('logged-in-user');
-    const loggedInSignature = cookie.get('logged-in-sig');
+    const cookieUsername = cookie.get('logged-in-user');
+    const cookieSignature = cookie.get('logged-in-sig');
 
-    const hasCookies =
-      loggedInUsername !== false && loggedInSignature !== false;
+    const hasCookies = cookieUsername !== false && cookieSignature !== false;
     if (!hasCookies)
       return {
         error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
@@ -66,8 +65,9 @@ export class UserService implements UserServiceInterface {
     const persistedUser = await this.getPersistedUser();
     if (persistedUser) {
       const user = User.fromUserResponse(persistedUser);
-      const nameMatches = loggedInUsername === user.username;
       // verify that the cached used matches the user in the cookie
+      // otherwise fetch new user info for the cookie'd user
+      const nameMatches = cookieUsername === user.username;
       if (nameMatches) {
         return { success: user };
       }
