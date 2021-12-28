@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "@internetarchive/user-service",
   "description": "Internet Archive User Service Client",
   "author": "Internet Archive",
@@ -23,7 +23,7 @@
   "dependencies": {
     "@internetarchive/field-parsers": "^0.1.0",
     "@internetarchive/result-type": "^0.0.1",
-    "cookie-store": "^3.0.0"
+    "cookiejs": "^2.0.2"
   },
   "devDependencies": {
     "@internetarchive/local-cache": "^0.0.1-alpha.4",
@@ -32,7 +32,7 @@
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
     "@web/dev-server": "^0.1.1",
-    "@web/test-runner": "^0.11.5",
+    "@web/test-runner": "^0.13.23",
     "concurrently": "^5.3.0",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^6.11.0",
