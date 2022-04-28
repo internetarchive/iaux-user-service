@@ -39,6 +39,11 @@ export interface UserInterface {
    * Info about the user's profile picture
    */
   image_info: UserImageInfoInterface;
+
+  /**
+   * If the user has an archive.org email address
+   */
+  isArchiveOrgUser: boolean;
 }
 
 export class User implements UserInterface {
@@ -59,6 +64,9 @@ export class User implements UserInterface {
 
   /** @inheritdoc */
   image_info: UserImageInfoInterface;
+
+  /** @inheritdoc */
+  isArchiveOrgUser: boolean;
 
   /**
    * Construct a UserModelInterface object from a UserResponse
@@ -90,6 +98,7 @@ export class User implements UserInterface {
     this.screenname = options.screenname;
     this.privs = options.privs;
     this.image_info = options.image_info;
+    this.isArchiveOrgUser = this.username.endsWith('@archive.org');
 
     const { itemname } = options;
     this.userid = itemname.startsWith('@') ? itemname.substring(1) : itemname;

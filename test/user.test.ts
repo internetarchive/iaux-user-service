@@ -40,4 +40,32 @@ describe('User', () => {
     expect(user.image_info.name).to.equal('foo.jpg');
     expect(user.image_info.mtime).to.equal(4567);
   });
+
+  it('properly populates `isArchiveOrg` value', async () => {
+    const user = new User({
+      username: 'foo@bar.org',
+      itemname: 'foo-user',
+      screenname: 'Foo-Bar',
+      privs: ['/'],
+      image_info: {
+        name: 'foo.jpg',
+        mtime: 4567,
+      },
+    });
+
+    expect(user.isArchiveOrgUser).to.be.false;
+
+    const user2 = new User({
+      username: 'foo@archive.org',
+      itemname: 'foo-user',
+      screenname: 'Foo-Bar',
+      privs: ['/'],
+      image_info: {
+        name: 'foo.jpg',
+        mtime: 4567,
+      },
+    });
+
+    expect(user2.isArchiveOrgUser).to.be.true;
+  });
 });
