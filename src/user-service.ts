@@ -53,9 +53,8 @@ export class UserService implements UserServiceInterface {
   /** @inheritdoc */
   async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
     const cookieUsername = cookie.get('logged-in-user');
-    const cookieSignature = cookie.get('logged-in-sig');
 
-    const hasCookies = cookieUsername !== false && cookieSignature !== false;
+    const hasCookies = cookieUsername !== false;
     if (!hasCookies)
       return {
         error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
