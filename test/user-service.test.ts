@@ -19,7 +19,6 @@ describe('UserService', () => {
     fetchStub = sandbox.stub(window, 'fetch');
     cookie.clear();
     cookie.set('logged-in-user', 'foo@bar.com');
-    cookie.set('logged-in-sig', 'abc123');
     fetchStub?.returns(getSuccessResponse());
   });
 
@@ -193,7 +192,6 @@ describe('UserService', () => {
 
       // now return a different user from the cookie
       cookie.set('logged-in-user', 'user@foo.com');
-      cookie.set('logged-in-sig', 'abc123');
 
       await userService.getLoggedInUser();
       // we should have fetched again
