@@ -48,7 +48,21 @@ export class AppRoot extends LitElement {
       <h2>Status</h2>
       ${this.error ? html`<p>Error: ${this.error}</p>` : nothing}
       ${this.loading ? html`<p>Loading...</p>` : this.userInfoTemplate}
+      <hr />
+      <p>
+        <button @click="${this.updateUser}">Clear user cache and reload</button>
+      </p>
+      <p>
+        Test by uploading new image in production for logged in user, then
+        hitting above button <br />noting changes in "mtime", "size", "md5",
+        etc.
+      </p>
     `;
+  }
+
+  private async updateUser() {
+    await this.userService.clearLoggedInUserCache();
+    window.location.reload();
   }
 
   private get userInfoTemplate(): TemplateResult {
@@ -64,6 +78,8 @@ export class AppRoot extends LitElement {
       <p>Item name: ${this.user.itemname}</p>
       <p>User name: ${this.user.username}</p>
       <p>Privs: ${this.user.privs}</p>
+      <p>Image info:</p>
+      <pre>${JSON.stringify(this.user.image_info, null, 2)}</pre>
       <p><a href="https://archive.org/account/logout">Logout</a></p>
     `;
   }

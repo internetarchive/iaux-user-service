@@ -13,6 +13,11 @@ export interface UserServiceInterface {
    * @memberof UserServiceInterface
    */
   getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>>;
+
+  /**
+   * Clear the cache of the current user info
+   */
+  clearLoggedInUserCache(): Promise<void>;
 }
 
 /**
@@ -25,6 +30,8 @@ export interface UserServiceCacheInterface {
   set(options: { key: string; value: any; ttl?: number }): Promise<void>;
 
   get(key: string): Promise<any>;
+
+  delete(key: string): Promise<void>;
 }
 
 export class UserService implements UserServiceInterface {
@@ -48,6 +55,12 @@ export class UserService implements UserServiceInterface {
     this.cache = options?.cache;
     this.cacheTTL = options?.cacheTTL;
     this.userCacheKey = options?.userCacheKey ?? 'loggedInUserInfo';
+  }
+
+  async clearLoggedInUserCache(): Promise<void> {
+    if (this.cache) {
+      await this.cache.delete(this.userCacheKey);
+    }
   }
 
   /** @inheritdoc */
