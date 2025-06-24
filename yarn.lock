@@ -65,17 +65,17 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@internetarchive/field-parsers@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@internetarchive/field-parsers/-/field-parsers-0.1.0.tgz#de8b42bb5f7d9fc696086815585a3174dacf0b57"
-  integrity sha512-6ByLemKZvCMJrDglC1Om5bkTT7pB/5Lq0uKkGzb4sO88+lTDy6pqbGGw6VGEe6gAYgyDKiTlNUyUoTzF5brq3Q==
+"@internetarchive/field-parsers@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@internetarchive/field-parsers/-/field-parsers-1.0.0.tgz#ee3d3efb280860018193c2c52d54ec784e9bb202"
+  integrity sha512-cbD0FtJOjzBm7exxFrzrkHnqbmalKbEXA4i7KrwhUGBojF/QTTLAvaIRXH/bfoiTyCh6YT1/E/mULAQPdB6yvQ==
 
-"@internetarchive/local-cache@^0.0.1-alpha.4":
-  version "0.0.1-alpha.4"
-  resolved "https://registry.npmjs.org/@internetarchive/local-cache/-/local-cache-0.0.1-alpha.4.tgz"
-  integrity sha512-TzdE9yvj6umekvpP3nARMIbafHNYUJ2AmT5iZyZkBZm8wXaGSPN0v4YfFXlUe0nLyJn7WYet6E7tlaAupDeliw==
+"@internetarchive/local-cache@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@internetarchive/local-cache/-/local-cache-0.2.1.tgz#fa416cae81227228b73f51d82f3361d460e27539"
+  integrity sha512-8FFAvEEoazktWsIEod2NVYp0r+Fk3OxM8woe42mNlXHbht3Je98yQjooIFiA3/sJYB7xsZB2RHzUzh+GmBHFgw==
   dependencies:
-    idb-keyval "^5.0.4"
+    idb-keyval "^6.1.0"
 
 "@internetarchive/result-type@^0.0.1":
   version "0.0.1"
@@ -2614,10 +2614,10 @@ iconv-lite@0.4.24:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-idb-keyval@^5.0.4:
-  version "5.0.4"
-  resolved "https://registry.npmjs.org/idb-keyval/-/idb-keyval-5.0.4.tgz"
-  integrity sha512-qS0kplHuadZujoE90ze0NUkhW0/Fbfib7d+mYNMXNEn45NSh2NWY3fBewoX4GZUsKkGHBgc8JiAwMx0zrfL3LQ==
+idb-keyval@^6.1.0:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-6.2.2.tgz#b0171b5f73944854a3291a5cdba8e12768c4854a"
+  integrity sha512-yjD9nARJ/jb1g+CvD0tlhUHOrJ9Sy0P8T9MF3YaLlHnSRpwPfpTX0XIvpmw3gAJUmEu3FiICLBDPXVwyEvrleg==
 
 ieee754@^1.1.13:
   version "1.2.1"
