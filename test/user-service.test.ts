@@ -1,4 +1,4 @@
-import { getCookie, removeCookie, setCookie } from 'typescript-cookie';
+import { removeCookie, setCookie } from 'typescript-cookie';
 import { LocalCache } from '@internetarchive/local-cache';
 import { expect } from '@open-wc/testing';
 import Sinon, { SinonStub } from 'sinon';
