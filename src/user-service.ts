@@ -66,7 +66,8 @@ export class UserService implements UserServiceInterface {
       const user = User.fromUserResponse(persistedUser);
       // verify that the cached used matches the user in the cookie
       // otherwise fetch new user info for the cookie'd user
-      const nameMatches = cookieUsername === user.username;
+      const decodedCookie = decodeURIComponent(cookieUsername);
+      const nameMatches = decodedCookie === user.username;
       if (nameMatches) {
         return { success: user };
       }

@@ -210,6 +210,8 @@ describe('UserService', () => {
       await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(1);
 
+      setCookie('logged-in-user', 'foo%40bar.com');
+
       await userService.getLoggedInUser();
       expect(fetchStub?.callCount).to.equal(1);
       cache.delete('foo-cache');
