@@ -1,4 +1,4 @@
-import cookie from 'cookiejs';
+import { getCookie } from 'typescript-cookie';
 import { Result } from '@internetarchive/result-type';
 import { UserResponse, UserServiceResponse } from './models/response';
 import { User } from './models/user';
@@ -52,9 +52,9 @@ export class UserService implements UserServiceInterface {
 
   /** @inheritdoc */
   async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
-    const cookieUsername = cookie.get('logged-in-user');
+    const cookieUsername = getCookie('logged-in-user');
 
-    const hasCookies = cookieUsername !== false;
+    const hasCookies = cookieUsername !== undefined;
     if (!hasCookies)
       return {
         error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
@@ -63,7 +63,6 @@ export class UserService implements UserServiceInterface {
     // check for cached user
     const persistedUser = await this.getPersistedUser();
     if (persistedUser) {
-      console.log('cached user found');
       const user = User.fromUserResponse(persistedUser);
       // verify that the cached used matches the user in the cookie
       // otherwise fetch new user info for the cookie'd user
@@ -75,7 +74,6 @@ export class UserService implements UserServiceInterface {
 
     // if another fetch is in progress, chain this request to it
     if (this.fetchPromise) {
-      console.log('fetch in progress, chaining request');
       this.fetchPromise = this.fetchPromise.then(response => {
         return response;
       });
