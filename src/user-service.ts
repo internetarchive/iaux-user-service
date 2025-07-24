@@ -69,6 +69,7 @@ export class UserService implements UserServiceInterface {
       const decodedCookie = decodeURIComponent(cookieUsername);
       const nameMatches = decodedCookie === user.username;
       if (nameMatches) {
+        // increase the cache TTL if successful
         await this.persistUser(persistedUser);
         return { success: user };
       }
