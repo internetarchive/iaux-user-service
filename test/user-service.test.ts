@@ -31,7 +31,9 @@ describe('UserService', () => {
       const userService = new UserService();
       await userService.getLoggedInUser();
       expect(
-        fetchStub?.calledWith('https://archive.org/services/user.php?op=whoami')
+        fetchStub?.calledWith(
+          'https://archive.org/services/user.php?op=whoami',
+        ),
       ).to.be.true;
     });
 

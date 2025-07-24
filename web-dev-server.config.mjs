@@ -5,9 +5,10 @@ const hmr = process.argv.includes('--hmr');
 
 export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
   nodeResolve: true,
-  open: '/demo/',
+  open: "/demo/",
   watch: !hmr,
 
+  hostname: "local.archive.org",
   /** Compile JS for older browsers. Requires @web/dev-server-esbuild plugin */
   // esbuildTarget: 'auto'
 
@@ -25,6 +26,6 @@ export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
   ],
 
   http2: true,
-  sslKey: './local.archive.org.key',
-  sslCert: './local.archive.org.cert',
+  sslKey: "./local.archive.org.key",
+  sslCert: "./local.archive.org.cert",
 });

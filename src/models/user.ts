@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { UserResponse } from './response';
 import { UserImageInfo, UserImageInfoInterface } from './user-image-info';
 

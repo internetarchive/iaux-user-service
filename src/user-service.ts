@@ -63,6 +63,7 @@ export class UserService implements UserServiceInterface {
     // check for cached user
     const persistedUser = await this.getPersistedUser();
     if (persistedUser) {
+      console.log('cached user found');
       const user = User.fromUserResponse(persistedUser);
       // verify that the cached used matches the user in the cookie
       // otherwise fetch new user info for the cookie'd user
@@ -74,6 +75,7 @@ export class UserService implements UserServiceInterface {
 
     // if another fetch is in progress, chain this request to it
     if (this.fetchPromise) {
+      console.log('fetch in progress, chaining request');
       this.fetchPromise = this.fetchPromise.then(response => {
         return response;
       });
@@ -101,7 +103,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.networkError,
-          (err as Error).message
+          (err as Error).message,
         ),
       };
     }
@@ -113,7 +115,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.decodingError,
-          (err as Error).message
+          (err as Error).message,
         ),
       };
     }
@@ -122,7 +124,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.userNotLoggedIn,
-          result.error
+          result.error,
         ),
       };
     }

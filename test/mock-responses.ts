@@ -47,6 +47,6 @@ export function getFailureResponse() {
       success: false,
       error: 'Authentication failed',
     },
-    401
+    401,
   );
 }
