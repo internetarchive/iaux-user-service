@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 export interface UserImageInfoResponse {
   name?: string;
   source?: string;

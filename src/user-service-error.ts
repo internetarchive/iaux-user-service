@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-shadow
 export enum UserServiceErrorType {
   userNotLoggedIn = 'UserService.userNotLoggedIn',
   networkError = 'UserService.networkError',

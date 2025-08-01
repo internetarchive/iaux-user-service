@@ -1,4 +1,4 @@
-import cookie from 'cookiejs';
+import { removeCookie, setCookie } from 'typescript-cookie';
 import { LocalCache } from '@internetarchive/local-cache';
 import { expect } from '@open-wc/testing';
 import Sinon, { SinonStub } from 'sinon';
@@ -17,8 +17,8 @@ let fetchStub: SinonStub | undefined;
 describe('UserService', () => {
   beforeEach(() => {
     fetchStub = sandbox.stub(window, 'fetch');
-    cookie.clear();
-    cookie.set('logged-in-user', 'foo@bar.com');
+    removeCookie('logged-in-user');
+    setCookie('logged-in-user', 'foo@bar.com');
     fetchStub?.returns(getSuccessResponse());
   });
 
@@ -31,7 +31,9 @@ describe('UserService', () => {
       const userService = new UserService();
       await userService.getLoggedInUser();
       expect(
-        fetchStub?.calledWith('https://archive.org/services/user.php?op=whoami')
+        fetchStub?.calledWith(
+          'https://archive.org/services/user.php?op=whoami',
+        ),
       ).to.be.true;
     });
 
@@ -52,7 +54,7 @@ describe('UserService', () => {
     });
 
     it('returns UserServiceErrorType.userNotLoggedIn if user does not have IA cookies', async () => {
-      cookie.clear();
+      removeCookie('logged-in-user');
 
       const userService = new UserService();
       const result = await userService.getLoggedInUser();
@@ -191,11 +193,27 @@ describe('UserService', () => {
       expect(fetchStub?.callCount).to.equal(1);
 
       // now return a different user from the cookie
-      cookie.set('logged-in-user', 'user@foo.com');
+      setCookie('logged-in-user', 'user@foo.com');
 
       await userService.getLoggedInUser();
       // we should have fetched again
       expect(fetchStub?.callCount).to.equal(2);
+      cache.delete('foo-cache');
+    });
+
+    it('reuses cached user if the cached user matches the cookie user with urlencoding', async () => {
+      const cache = new LocalCache({ namespace: 'boop' });
+      const userService = new UserService({
+        cache,
+        userCacheKey: 'foo-cache',
+      });
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(1);
+
+      setCookie('logged-in-user', 'foo%40bar.com');
+
+      await userService.getLoggedInUser();
+      expect(fetchStub?.callCount).to.equal(1);
       cache.delete('foo-cache');
     });
   });

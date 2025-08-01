@@ -1,4 +1,4 @@
-import cookie from 'cookiejs';
+import { getCookie } from 'typescript-cookie';
 import { Result } from '@internetarchive/result-type';
 import { UserResponse, UserServiceResponse } from './models/response';
 import { User } from './models/user';
@@ -52,9 +52,9 @@ export class UserService implements UserServiceInterface {
 
   /** @inheritdoc */
   async getLoggedInUser(): Promise<Result<UserInterface, UserServiceError>> {
-    const cookieUsername = cookie.get('logged-in-user');
+    const cookieUsername = getCookie('logged-in-user');
 
-    const hasCookies = cookieUsername !== false;
+    const hasCookies = cookieUsername !== undefined;
     if (!hasCookies)
       return {
         error: new UserServiceError(UserServiceErrorType.userNotLoggedIn),
@@ -66,8 +66,11 @@ export class UserService implements UserServiceInterface {
       const user = User.fromUserResponse(persistedUser);
       // verify that the cached used matches the user in the cookie
       // otherwise fetch new user info for the cookie'd user
-      const nameMatches = cookieUsername === user.username;
+      const decodedCookie = decodeURIComponent(cookieUsername);
+      const nameMatches = decodedCookie === user.username;
       if (nameMatches) {
+        // increase the cache TTL if successful
+        await this.persistUser(persistedUser);
         return { success: user };
       }
     }
@@ -101,7 +104,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.networkError,
-          (err as Error).message
+          (err as Error).message,
         ),
       };
     }
@@ -113,7 +116,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.decodingError,
-          (err as Error).message
+          (err as Error).message,
         ),
       };
     }
@@ -122,7 +125,7 @@ export class UserService implements UserServiceInterface {
       return {
         error: new UserServiceError(
           UserServiceErrorType.userNotLoggedIn,
-          result.error
+          result.error,
         ),
       };
     }

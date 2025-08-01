@@ -1,12 +1,6 @@
 import { LocalCache } from '@internetarchive/local-cache';
-import {
-  html,
-  css,
-  LitElement,
-  customElement,
-  internalProperty,
-} from 'lit-element';
-import { nothing, TemplateResult } from 'lit-html';
+import { html, css, LitElement, TemplateResult, nothing } from 'lit';
+import { state, customElement } from 'lit/decorators.js';
 import { User } from '../src/models/user';
 import { UserService } from '../src/user-service';
 import { UserServiceErrorType } from '../src/user-service-error';
@@ -17,13 +11,13 @@ export class AppRoot extends LitElement {
 
   userService = new UserService({ cache: this.localCache });
 
-  @internalProperty()
+  @state()
   private user?: User | null;
 
-  @internalProperty()
+  @state()
   private loading = false;
 
-  @internalProperty()
+  @state()
   private error?: string;
 
   firstUpdated(): void {
@@ -63,7 +57,10 @@ export class AppRoot extends LitElement {
       <p>Screen name: ${this.user.screenname}</p>
       <p>Item name: ${this.user.itemname}</p>
       <p>User name: ${this.user.username}</p>
-      <p>Privs: ${this.user.privs}</p>
+      <p>Privs:
+      <ul>${this.user.privs.map(priv => {
+        return html`<li>${priv}</li>`;
+      })}</ul></p>
       <p><a href="https://archive.org/account/logout">Logout</a></p>
     `;
   }
@@ -78,19 +75,15 @@ export class AppRoot extends LitElement {
 
     switch (result.error?.type) {
       case UserServiceErrorType.userNotLoggedIn:
-        console.info('User not logged in');
         break;
       case UserServiceErrorType.networkError:
         this.error = 'There was a network error fetching the user';
-        console.error('There was a network error fetching the user');
         break;
       case UserServiceErrorType.decodingError:
         this.error = 'There was an error decoding the user service response';
-        console.error('There was an error decoding the user service response');
         break;
       default:
         this.error = 'An unknown error occurred fetching the user';
-        console.error('An unknown error occurred fetching the user');
     }
   }
 

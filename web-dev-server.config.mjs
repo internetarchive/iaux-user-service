@@ -8,6 +8,7 @@ export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
   open: '/demo/',
   watch: !hmr,
 
+  hostname: 'local.archive.org',
   /** Compile JS for older browsers. Requires @web/dev-server-esbuild plugin */
   // esbuildTarget: 'auto'
 
