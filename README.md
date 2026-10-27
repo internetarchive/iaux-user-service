@@ -2,6 +2,8 @@
 
 # IAUX User Service
 
+> Moved to [@internetarchive/elements](https://github.com/internetarchive/elements) (`src/services/user-service`). New work goes there.
+
 This is a Typescript library to interact with the Internet Archive's User Service.
 
 ## Usage
